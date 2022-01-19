@@ -5,27 +5,35 @@ import { tooltip } from './tooltip.js';
 
 const { PADDING, DPI_WIDTH, DPI_HEIGHT, VIEW_HEIGHT, ROWS_COUNT } = constants;
 
-export const xAxis = ({ ctx, data, xRatio, xDates, yData, allData, proxy }) => {
-  // console.log(data);
+export const xAxis = ({
+  ctx,
+  xData,
+  xRatio,
+  xDates,
+  yData,
+  allData,
+  proxy,
+}) => {
+  // console.log('xData', xData);
+  // console.log('xDates', xDates);
   const { mouse } = proxy;
-  // console.log(mouse);
 
   const colsCount = 6;
-  const step = Math.round(data.length / colsCount);
+  const step = Math.round(xData.length / colsCount);
   ctx.font = 'normal 20px sans-serif';
   ctx.fillStyle = '#96a2aa';
 
   ctx.beginPath();
 
-  for (let i = 1; i < data.length; i += 1) {
+  for (let i = 1; i < xData.length; i += 1) {
     const x = i * xRatio;
 
     if ((i - 1) % step === 0) {
-      const text = toDate(data[i]);
+      const text = toDate(xDates[i]);
       ctx.fillText(text, x, DPI_HEIGHT - 2);
     }
 
-    if (isOver({ mouse, x, length: data.length })) {
+    if (isOver({ mouse, x, length: xData.length })) {
       // ctx.save();
       ctx.moveTo(x, PADDING / 2);
       ctx.lineTo(x, DPI_HEIGHT - PADDING);

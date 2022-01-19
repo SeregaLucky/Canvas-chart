@@ -72,19 +72,37 @@ export function chart(data) {
   function paint() {
     clear(ctx);
 
-    const [yMin, yMax] = computeBoundaries(data);
-    const xRatio = VIEW_WIDTH / (data.columns[0].length - 2);
-    const yRatio = VIEW_HEIGHT / (yMax - yMin);
+    const length = data.columns[0].length;
+    const leftIndex = Math.round((length * proxy.pos[0]) / 100);
+    const rightIndex = Math.round((length * proxy.pos[1]) / 100);
 
-    const xData = data.columns.filter(col => data.types[col[0]] === 'line')[0];
-    const xDates = data.columns.filter(col => data.types[col[0]] !== 'line')[0];
-    const yData = data.columns.filter(col => data.types[col[0]] === 'line');
+    const columns = data.columns.map(col => {
+      const res = col.slice(leftIndex, rightIndex);
+      if (typeof res[0] !== 'string') {
+        res.unshift(col[0]);
+      }
+      return res;
+    });
 
+    // const [yMin, yMax] = computeBoundaries(data);
+    // const xRatio = DPI_WIDTH / (data.columns[0].length - 2);
+    // const yRatio = DPI_HEIGHT / (yMax - yMin);
+    // const xData = data.columns.filter(col => data.types[col[0]] === 'line')[0];
+    // const yData = data.columns.filter(col => data.types[col[0]] === 'line');
+    // const xDates = data.columns.filter(col => data.types[col[0]] !== 'line')[0];
     // console.log('1111111 yData', yData);
+
+    const [yMin, yMax] = computeBoundaries({ columns, types: data.types });
+    const xRatio = VIEW_WIDTH / (columns[0].length - 2);
+    // const yRatio = VIEW_HEIGHT / (yMax - yMin);
+    const yRatio = (yMax - yMin) / VIEW_HEIGHT;
+    const xData = columns.filter(col => data.types[col[0]] === 'line')[0];
+    const yData = columns.filter(col => data.types[col[0]] === 'line');
+    const xDates = columns.filter(col => data.types[col[0]] !== 'line')[0];
 
     xAxis({
       ctx,
-      data: xData,
+      xData,
       xDates: xDates.slice(1),
       yData,
       allData: data,
@@ -94,7 +112,7 @@ export function chart(data) {
     /* y axis */
     yAxis({ ctx, yMin, yMax });
 
-    yData.map(toCoords(xRatio, yRatio)).forEach((coords, idx) => {
+    yData.map(toCoords(xRatio, yRatio, yMin)).forEach((coords, idx) => {
       const color = data.colors[yData[idx][0]];
 
       line(ctx, coords, { color });

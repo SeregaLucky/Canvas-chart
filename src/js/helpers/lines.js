@@ -2,12 +2,23 @@ import constants from '../constants/constants';
 
 const { DPI_HEIGHT, PADDING } = constants;
 
-export const toCoords = (xRatio, yRatio) => {
+// export const toCoords = (xRatio, yRatio) => {
+//   return col => {
+//     return col
+//       .map((y, idx) => [
+//         Math.floor((idx - 1) * xRatio),
+//         Math.floor(DPI_HEIGHT - PADDING - y * yRatio),
+//       ])
+//       .filter((_, idx) => idx !== 0);
+//   };
+// };
+
+export const toCoords = (xRatio, yRatio, yMin) => {
   return col => {
     return col
       .map((y, idx) => [
         Math.floor((idx - 1) * xRatio),
-        Math.floor(DPI_HEIGHT - PADDING - y * yRatio),
+        Math.floor(DPI_HEIGHT - PADDING - (y - yMin) / yRatio),
       ])
       .filter((_, idx) => idx !== 0);
   };
